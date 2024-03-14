@@ -1,11 +1,11 @@
-package service
+package about
 
 import "database/sql"
 
-type Service struct {
+type About struct {
 	db *sql.DB
 }
 
-func New(storage *sql.DB) *Service {
-	return &Service{db: storage}
+func New(storage *sql.DB) *About {
+	return &About{db: storage}
 }

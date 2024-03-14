@@ -1,4 +1,4 @@
-package login
+package controllers
 
 import (
 	"database/sql"
@@ -15,7 +15,7 @@ type Cookies struct {
 	Uuid string `cookie:"uuid"`
 }
 
-func New(db *sql.DB) *Login {
+func LoginNew(db *sql.DB) *Login {
 	lg := login.New(db)
 	return &Login{login: lg}
 }

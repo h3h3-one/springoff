@@ -1,5 +1,17 @@
-{{template "partials/header" .}}
+<div class="container-fluid" data-aos="fade" data-aos-delay="500">
+    <div class="row" data-masonry='{"percentPosition": true }'>
 
-<h1>{{.Title}}</h1>
+        {{range .AllAlbums}}
+        <div class="col-lg-4">
+            <div class="image-wrap-2">
+                <div class="image-info">
+                    <h2 class="mb-3">{{.TitleAlbum}}</h2>
+                    <a href="/albums/{{.IdAlbum}}" class="btn btn-outline-white py-2 px-4">Больше фото</a>
+                </div>
+                <img src="{{.PathCover}}" alt="Image" class="img-fluid">
+            </div>
+        </div>
+        {{end}}
 
-{{template "partials/footer" .}}
+    </div>
+</div>

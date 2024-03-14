@@ -1,111 +1,67 @@
-.file-upload {
-    background-color: #ffffff;
-    width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.file-upload-btn {
-    width: 100%;
-    margin: 0;
-    color: #fff;
-    background: #1FB264;
-    border: none;
-    padding: 10px;
-    border-radius: 4px;
-    border-bottom: 4px solid #15824B;
-    transition: all .2s ease;
-    outline: none;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-.file-upload-btn:hover {
-    background: #1AA059;
-    color: #ffffff;
-    transition: all .2s ease;
-    cursor: pointer;
-}
-
-.file-upload-btn:active {
-    border: 0;
-    transition: all .2s ease;
-}
-
-.file-upload-content {
-    display: none;
-    text-align: center;
-}
-
-.file-upload-input {
-    position: absolute;
+/* Reset default browser styles for a more consistent base */
+* {
     margin: 0;
     padding: 0;
-    width: 100%;
-    height: 100%;
-    outline: none;
-    opacity: 0;
-    cursor: pointer;
+    box-sizing: border-box;
 }
 
-.image-upload-wrap {
-    margin-top: 20px;
-    border: 4px dashed #1FB264;
-    position: relative;
+/* Container for form elements (optional for basic layout) */
+.form-container {
+    width: 100%; /* Ensures full width on all devices */
+    max-width: 500px; /* Adjust as needed for desired maximum width */
+    margin: 0 auto; /* Centers the form horizontally */
+    padding: 20px; /* Adds some padding for better readability */
 }
 
-.image-dropping,
-.image-upload-wrap:hover {
-    background-color: #1FB264;
-    border: 4px dashed #ffffff;
+/* Labels and input elements */
+label {
+    display: block; /* Makes labels appear on separate lines */
+    margin-bottom: 5px; /* Spacing between label and input */
+    font-weight: bold;
 }
 
-.image-title-wrap {
-    padding: 0 15px 15px 15px;
-    color: #222;
+input[type="file"] {
+    width: 100%; /* Makes input field fill the available width */
+    padding: 5px;
+    border: 1px solid #ccc; /* Basic border styling */
+    border-radius: 4px; /* Rounded corners for a smoother look */
+    cursor: pointer; /* Indicates hover/click behavior */
 }
 
-.drag-text {
-    text-align: center;
+/* Customizing the "Choose images..." text (optional) */
+input[type="file"]::-webkit-file-upload-button {
+    background-color: #f0f0f0; /* Background color for button */
+    color: #333; /* Text color for button */
+    padding: 8px 10px; /* Adjust padding as desired */
+    border: none; /* Removes default button border */
+    border-radius: 4px; /* Matches input field border radius */
+    cursor: pointer; /* Indicates hover/click behavior */
 }
 
-.drag-text h3 {
-    font-weight: 100;
-    text-transform: uppercase;
-    color: #15824B;
-    padding: 60px 0;
+input[type="file"]::file-selector-button {
+    /* Similar styles for Firefox and other browsers */
 }
 
-.file-upload-image {
-    max-height: 200px;
-    max-width: 200px;
-    margin: auto;
-    padding: 20px;
+/* Preview sections (optional) */
+.previewCover,
+.previewAlbum {
+    margin-top: 10px; /* Spacing after preview text */
+    font-style: italic;
+    color: #999;
 }
 
-.remove-image {
-    width: 200px;
-    margin: 0;
-    color: #fff;
-    background: #cd4535;
+/* Button */
+button {
+    width: 100%; /* Fills the available width */
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Adjust color as desired */
+    color: white;
     border: none;
-    padding: 10px;
     border-radius: 4px;
-    border-bottom: 4px solid #b02818;
-    transition: all .2s ease;
-    outline: none;
-    text-transform: uppercase;
-    font-weight: 700;
-}
-
-.remove-image:hover {
-    background: #c13b2a;
-    color: #ffffff;
-    transition: all .2s ease;
     cursor: pointer;
+    transition: background-color 0.2s ease-in-out; /* Smooth hover effect */
 }
 
-.remove-image:active {
-    border: 0;
-    transition: all .2s ease;
+button:hover {
+    background-color: #3e8e41; /* Adjust hover color as desired */
 }

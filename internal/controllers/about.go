@@ -1,4 +1,4 @@
-package about
+package controllers
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ type About struct {
 	about *about.About
 }
 
-func New(db *sql.DB) *About {
+func AboutNew(db *sql.DB) *About {
 	abt := about.New(db)
 	return &About{about: abt}
 }

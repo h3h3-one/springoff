@@ -1,11 +1,11 @@
-package about
+package contact
 
 import "database/sql"
 
-type About struct {
+type Contact struct {
 	db *sql.DB
 }
 
-func New(storage *sql.DB) *About {
-	return &About{db: storage}
+func New(storage *sql.DB) *Contact {
+	return &Contact{db: storage}
 }

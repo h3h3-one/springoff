@@ -1,4 +1,4 @@
-package home
+package controllers
 
 import (
 	"database/sql"
@@ -11,7 +11,7 @@ type Home struct {
 	album *album.Album
 }
 
-func New(db *sql.DB) *Home {
+func HomeNew(db *sql.DB) *Home {
 	alb := album.New(db)
 	return &Home{album: alb}
 }

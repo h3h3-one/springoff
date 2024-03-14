@@ -1,4 +1,4 @@
-package contact
+package controllers
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ type Contact struct {
 	contact *contact.Contact
 }
 
-func New(db *sql.DB) *Contact {
+func ContactNew(db *sql.DB) *Contact {
 	cont := contact.New(db)
 	return &Contact{contact: cont}
 }

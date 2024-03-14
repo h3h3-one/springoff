@@ -1,4 +1,4 @@
-package service
+package controllers
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ type Service struct {
 	service *service.Service
 }
 
-func New(db *sql.DB) *Service {
+func ServiceNew(db *sql.DB) *Service {
 	srv := service.New(db)
 	return &Service{service: srv}
 }
