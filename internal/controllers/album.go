@@ -3,20 +3,16 @@ package controllers
 import (
 	"database/sql"
 	"github.com/gofiber/fiber/v2"
-	"log"
 	"log/slog"
 	"springoff/internal/models/album"
+	"springoff/internal/models/upload"
+	"strconv"
+	"strings"
 )
 
 type Album struct {
 	album *album.Album
 }
-
-//type UploadAlbum struct {
-//	Title string `form:"title"`
-//	Cover string `form:"cover"`
-//	Album string `json:"album"`
-//}
 
 func AlbumNew(db *sql.DB) *Album {
 	alb := album.New(db)
@@ -45,38 +41,44 @@ func (a *Album) GetAlbum() func(c *fiber.Ctx) error {
 
 func (a *Album) UploadAlbum() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
+		if form, err := c.MultipartForm(); err == nil {
+			up, err := upload.New(form.Value["title"], form.File["cover"], form.File["albumImage"])
+			if err != nil {
+				slog.Error("Error validate forms adding album", "err", err)
+				return c.Status(400).JSON(fiber.Map{
+					"error": err.Error(),
+				})
+			}
 
-		//upload := new(UploadAlbum)
-		//
-		//if err := c.BodyParser(&upload); err != nil {
-		//	log.Print(upload)
-		//}
-		form, err := c.MultipartForm()
-		// Parse the multipart form:
-		if err == nil {
-			// => *multipart.Form
-			//title := form.Value["title"][0]
-			//Validate title
-			//if len(title) > 0 {
-			//........
-			//}
-			title := form.Value["title"]
-			cover := form.File["cover"]
-			albumImage := form.File["albumUpload[]"]
-
-			log.Print(cover, albumImage, title)
-			// Loop through files:
-			//for _, file := range files {
-			//	fmt.Println(file.Filename, file.Size, file.Header["Content-Type"][0])
-			//	// => "tutorial.pdf" 360641 "application/pdf"
-			//
-			//	// Save the files to disk:
-			//	if err := c.SaveFile(file, fmt.Sprintf("./%s", file.Filename)); err != nil {
-			//		return err
-			//	}
-			//}
+			if err := a.album.Upload(up, c); err != nil {
+				slog.Error("Error upload album", "err", err)
+				return c.Status(400).JSON(fiber.Map{
+					"error": err.Error(),
+				})
+			}
 		}
 
-		return nil
+		slog.Info("Album added successfully")
+		return c.Status(200).JSON(fiber.Map{
+			"successfully": "album added successfully",
+		})
+	}
+}
+
+func (a *Album) DeleteAlbum() func(c *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		temp := string(c.Body())                                  //id=...
+		idAlbum, err := strconv.Atoi(strings.Split(temp, "=")[1]) // int id
+		if err != nil {
+			return err
+		}
+		if err := a.album.Delete(idAlbum); err != nil {
+			return c.Status(400).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+		return c.Status(200).JSON(fiber.Map{
+			"successfully": "album deleted successfully",
+		})
 	}
 }

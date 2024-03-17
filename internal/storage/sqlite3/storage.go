@@ -24,35 +24,40 @@ func New(path string) (*sql.DB, error) {
 	}
 
 	_, err = tx.Exec(`
-		PRAGMA foreign_keys=on;
-
 		CREATE TABLE IF NOT EXISTS albums(
-			id_album INTEGER PRIMARY KEY AUTOINCREMENT,
-			title_album VARCHAR(30) NOT NULL,
-			path_cover VARCHAR(30) NOT NULL
-		);
-
+					id_album INTEGER PRIMARY KEY AUTOINCREMENT,
+					title_album VARCHAR(30) NOT NULL,
+					path_cover VARCHAR(30) NOT NULL
+				);
+		
+		`)
+	_, err = tx.Exec(`
 		CREATE TABLE IF NOT EXISTS images(
-			id_image INTEGER PRIMARY KEY AUTOINCREMENT,
-			path_image VARCHAR(30) NOT NULL,
-			id_album VARCHAR(30) NOT NULL,
-			CONSTRAINT fk_album
-			FOREIGN KEY (id_album)
-			REFERENCES albums (id_album)
-			ON DELETE CASCADE
-		);
+					id_image INTEGER PRIMARY KEY AUTOINCREMENT,
+					path_image VARCHAR(30) NOT NULL,
+					id_album VARCHAR(30) NOT NULL,
+					CONSTRAINT fk_album
+					FOREIGN KEY (id_album)
+					REFERENCES albums (id_album)
+					ON DELETE CASCADE
+				);
+		
+		`)
+	_, err = tx.Exec(`
 
-		CREATE TABLE IF NOT EXISTS users(
-			id_user INTEGER PRIMARY KEY AUTOINCREMENT,
-			login VARCHAR(30) NOT NULL,
-			password VARCHAR(30) NOT NULL
-		);
-
-		CREATE TABLE IF NOT EXISTS uuid(
-			id_uuid INTEGER PRIMARY KEY AUTOINCREMENT,
-			uuid VARCHAR(30) NOT NULL
-		);
-
+	CREATE TABLE IF NOT EXISTS users(
+				id_user INTEGER PRIMARY KEY AUTOINCREMENT,
+				login VARCHAR(30) NOT NULL,
+				password VARCHAR(30) NOT NULL
+			);
+	`)
+	_, err = tx.Exec(`
+			CREATE TABLE IF NOT EXISTS uuid(
+				id_uuid INTEGER PRIMARY KEY AUTOINCREMENT,
+				uuid VARCHAR(30) NOT NULL
+			);
+	`)
+	_, err = tx.Exec(`
 		CREATE UNIQUE INDEX IF NOT EXISTS index_uuid
 		on uuid (uuid);
 	`)

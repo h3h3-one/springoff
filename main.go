@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
-	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/template/html/v2"
 	"log"
 	"log/slog"
@@ -55,9 +54,6 @@ func main() {
 
 	//middleware
 	app.Use(auth.Check(db))
-	app.Use(compress.New(compress.Config{
-		Level: compress.LevelBestCompression,
-	}))
 
 	//static files
 	app.Static("/", "./static")
@@ -100,9 +96,10 @@ func main() {
 	api.Get("/login", login.NewAuthorization())
 	api.Get("/album/adding", func(ctx *fiber.Ctx) error {
 		return ctx.Render("adding-album", fiber.Map{"Adding": "active", "Title": "Добавить альбом"})
-		//return ctx.Render("temp", fiber.Map{"Adding": "active", "Title": "Добавить альбом"})
 	})
+
 	api.Post("/album", album.UploadAlbum())
+	api.Delete("/album", album.DeleteAlbum())
 
 	log.Fatal(app.Listen(cfg.Address + cfg.Port))
 }

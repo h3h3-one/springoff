@@ -7,11 +7,42 @@
                 <div class="image-info">
                     <h2 class="mb-3">{{.TitleAlbum}}</h2>
                     <a href="/albums/{{.IdAlbum}}" class="btn btn-outline-white py-2 px-4">Больше фото</a>
+                    {{if $.Auth}}
+                    <br><br>
+                    <button class="btn-danger text-light py-2 px-4" onclick="deleteAlbum(this)" value="{{.IdAlbum}}">Удалить</button>
+                    {{end}}
                 </div>
-                <img src="{{.PathCover}}" alt="Image" class="img-fluid">
+                <img src="/covers/{{.PathCover}}" alt="Image" class="img-fluid">
             </div>
         </div>
         {{end}}
 
+
     </div>
 </div>
+
+{{if .Auth}}
+<script>
+    function deleteAlbum(e) {
+        const question = confirm("Are you sure?")
+        if (question) {
+            fetch("/admin/album", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: "id="+e.value
+            })
+            .then((res) => res.json())
+            .then((res) => {
+                if(res.error){
+                    alert(res.error)
+                } else {
+                    alert(res.successfully)
+                    window.location = "/"
+                }
+            })
+        }
+    }
+</script>
+{{end}}

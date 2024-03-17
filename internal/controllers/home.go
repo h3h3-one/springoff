@@ -22,6 +22,6 @@ func (h *Home) GetAllAlbums() func(c *fiber.Ctx) error {
 		if err != nil {
 			slog.Error("Error get all albums", "error", err)
 		}
-		return c.Render("home", fiber.Map{"AllAlbums": allAlbums, "Title": "Главная страница", "Home": "active"})
+		return c.Render("home", fiber.Map{"AllAlbums": allAlbums, "Title": "Главная страница", "Home": "active", "Auth": true})
 	}
 }
