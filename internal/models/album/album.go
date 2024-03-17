@@ -103,10 +103,16 @@ func (a *Album) Upload(upload *upload.Upload, c *fiber.Ctx) error {
 		slog.Error("Error create cover dir", "err", err, "album name", albumName, "path", fmt.Sprintf("%s%s", PathCovers, albumName))
 		return fmt.Errorf("error create cover dir")
 	}
-	//adding a file to the "covers" folder
-	if err := c.SaveFile(upload.Cover[0], fmt.Sprintf("%s%s/%s.jpg", PathCovers, albumName, coverName)); err != nil {
-		slog.Error("Error save cover image", "err", err, "path", fmt.Sprintf("%s%s/%s.jpg", PathCovers, albumName, coverName), "image name", upload.Cover[0].Filename)
-		return fmt.Errorf("error save cover image")
+	cvrCreate, err := os.Create(fmt.Sprintf("%s%s/%s.jpg", PathCovers, albumName, coverName))
+	if err != nil {
+		return fmt.Errorf("error create cover image")
+	}
+	if err := util.WriteFile(upload.Cover[0], cvrCreate); err != nil {
+		return err
+	}
+	err = cvrCreate.Close()
+	if err != nil {
+		return err
 	}
 	//creating a folder within a folder with "albums"
 	if err := os.Mkdir(fmt.Sprintf("%s%s", PathAlbums, albumName), 0777); err != nil {
@@ -116,11 +122,18 @@ func (a *Album) Upload(upload *upload.Upload, c *fiber.Ctx) error {
 	//adding a file to the "albums" folder
 	for i := 0; i < len(upload.Album); i++ {
 		albumImageName := util.RandomName()
-		if err := c.SaveFile(upload.Album[i], fmt.Sprintf("%s%s/%s.jpg", PathAlbums, albumName, albumImageName)); err != nil {
-			slog.Error("Error save album image", "err", err, "path", fmt.Sprintf("%s%s/%s.jpg", PathAlbums, albumName, albumImageName), "image name", upload.Album[i].Filename)
-			return fmt.Errorf("error save album image")
+		albCreate, err := os.Create(fmt.Sprintf("%s%s/%s.jpg", PathAlbums, albumName, albumImageName))
+		if err != nil {
+			return fmt.Errorf("error create cover image")
+		}
+		if err := util.WriteFile(upload.Album[i], albCreate); err != nil {
+			return err
 		}
 		pathImage[i] = fmt.Sprintf("%s/%s.jpg", albumName, albumImageName)
+		err = albCreate.Close()
+		if err != nil {
+			return err
+		}
 	}
 
 	slog.Info("transaction initialization")
@@ -150,6 +163,7 @@ func (a *Album) Upload(upload *upload.Upload, c *fiber.Ctx) error {
 }
 
 func (a *Album) Delete(id int) error {
+
 	slog.Info("delete album", "id album", id)
 
 	album := Albums{}
@@ -159,6 +173,7 @@ func (a *Album) Delete(id int) error {
 		slog.Error("error query \"SELECT path_cover FROM albums WHERE id_album=?\"")
 		return err
 	}
+
 	albumName := strings.Split(album.PathCover, "/")[0]
 	if err := os.RemoveAll("./static/covers/" + albumName); err != nil {
 		slog.Error("error delete covers from file system", "err", err)
@@ -168,12 +183,13 @@ func (a *Album) Delete(id int) error {
 		slog.Error("error delete covers from file system", "err", err)
 		return err
 	}
+
 	slog.Info("album successfully deleted from file system", "album name", albumName)
+
 	res, err := a.db.Exec(`
 	PRAGMA foreign_keys = ON;
 	DELETE FROM albums WHERE id_album=?
 	`, id)
-
 	affect, err := res.RowsAffected()
 	if affect == 0 {
 		slog.Error("album deletion error", "id", id)
@@ -183,6 +199,7 @@ func (a *Album) Delete(id int) error {
 		slog.Error("error when executing a request to delete an album")
 		return err
 	}
+
 	slog.Info("album successfully deleted from database")
 
 	return nil
