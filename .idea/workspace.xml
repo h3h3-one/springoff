@@ -5,29 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b2f8b496-bf20-437f-8179-06270122239e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/static/css/jquery-ui.css.fiber.gz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css/style.css.fiber.gz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/jquery-ui.js.fiber.gz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/lightgallery-all.min.js.fiber.gz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/masonry.pkgd.min.js.fiber.gz" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/owl.carousel.min.js.fiber.gz" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/c88e5d10-1245-44fb-8e90-7e76673232f1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/c88e5d10-1245-44fb-8e90-7e76673232f1.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/springoff.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/springoff.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/config/local.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/local.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/config/config.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/controllers/album.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controllers/album.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/controllers/home.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controllers/home.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/models/album/album.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/models/album/album.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/storage/sqlite3/storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/sqlite3/storage.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/util/writeFile.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/util/writeFile.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/views/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/internal/views/about.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/views/album.html" beforeDir="false" afterPath="$PROJECT_DIR$/internal/views/album.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/views/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/internal/views/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/storage/storage.db" beforeDir="false" afterPath="$PROJECT_DIR$/storage/storage.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,39 +40,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "DefaultGoTemplateProperty": "Go Application",
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Go Build.go build main.go.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "RunOnceActivity.go.vendoring.notification.had.been.shown": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "main",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/Admin",
-    "list.type.of.created.stylesheet": "CSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go Application&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Go Build.go build main.go.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.automatic.dependencies.download&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.vendoring.notification.had.been.shown&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Admin&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "sqlite"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;sqlite&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Admin\Мой диск\Golang project documents\springoff\static\custom" />
