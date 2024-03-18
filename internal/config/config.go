@@ -11,6 +11,7 @@ type Config struct {
 	Env        string `yaml:"env" env-default:"local"`
 	Storage    string `yaml:"storage"`
 	HTTPServer `yaml:"http_server"`
+	SecretKey  string `yaml:"secret_key"`
 }
 
 type HTTPServer struct {

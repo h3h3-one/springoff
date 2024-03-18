@@ -27,15 +27,15 @@ func New(path string) (*sql.DB, error) {
 		CREATE TABLE IF NOT EXISTS albums(
 					id_album INTEGER PRIMARY KEY AUTOINCREMENT,
 					title_album VARCHAR(30) NOT NULL,
-					path_cover VARCHAR(30) NOT NULL
+					path_cover VARCHAR(128) NOT NULL
 				);
 		
 		`)
 	_, err = tx.Exec(`
 		CREATE TABLE IF NOT EXISTS images(
 					id_image INTEGER PRIMARY KEY AUTOINCREMENT,
-					path_image VARCHAR(30) NOT NULL,
-					id_album VARCHAR(30) NOT NULL,
+					path_image VARCHAR(128) NOT NULL,
+					id_album INT NOT NULL,
 					CONSTRAINT fk_album
 					FOREIGN KEY (id_album)
 					REFERENCES albums (id_album)

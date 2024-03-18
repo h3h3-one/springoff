@@ -5,10 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b2f8b496-bf20-437f-8179-06270122239e" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/internal/util/writeFile.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/jquery-ui.css.fiber.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/css/style.css.fiber.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/jquery-ui.js.fiber.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/lightgallery-all.min.js.fiber.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/masonry.pkgd.min.js.fiber.gz" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/owl.carousel.min.js.fiber.gz" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/c88e5d10-1245-44fb-8e90-7e76673232f1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/c88e5d10-1245-44fb-8e90-7e76673232f1.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/springoff.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/springoff.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/local.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/config/local.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/config/config.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/config/config.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/controllers/album.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controllers/album.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/controllers/home.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/controllers/home.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/models/album/album.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/models/album/album.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/storage/sqlite3/storage.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/storage/sqlite3/storage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/util/writeFile.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/util/writeFile.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/views/about.html" beforeDir="false" afterPath="$PROJECT_DIR$/internal/views/about.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/views/album.html" beforeDir="false" afterPath="$PROJECT_DIR$/internal/views/album.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/views/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/internal/views/home.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/storage/storage.db" beforeDir="false" afterPath="$PROJECT_DIR$/storage/storage.db" afterDir="false" />
     </list>
@@ -63,7 +80,7 @@
     "git-widget-placeholder": "main",
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/h3h3",
+    "last_opened_file_path": "C:/Users/Admin",
     "list.type.of.created.stylesheet": "CSS",
     "node.js.detected.package.eslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -126,6 +143,15 @@
     <settings-migrated>true</settings-migrated>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/internal/controllers/album.go</url>
+          <line>44</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="GoApplicationRunConfiguration">
         <watch expression="*(*&quot;int&quot;)(824635686968)" />

@@ -46,6 +46,7 @@ func main() {
 	app := fiber.New(fiber.Config{
 		Views:       engine,
 		ViewsLayout: "layouts/main",
+		BodyLimit:   60 * 1024 * 1024,
 		ErrorHandler: func(ctx *fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
 
@@ -109,7 +110,7 @@ func main() {
 		return ctx.Render("adding-album", fiber.Map{"Adding": "active", "Title": "Добавить альбом"})
 	})
 
-	api.Post("/album", album.UploadAlbum())
+	api.Post("/album", album.UploadAlbum(cfg))
 	api.Delete("/album", album.DeleteAlbum())
 
 	log.Fatal(app.Listen(cfg.Address + cfg.Port))

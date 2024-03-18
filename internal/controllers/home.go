@@ -18,7 +18,7 @@ func HomeNew(db *sql.DB) *Home {
 
 func (h *Home) GetAllAlbums() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		allAlbums, err := h.album.GetAlbums()
+		allAlbums, err := h.album.GetAll()
 		if err != nil {
 			slog.Error("Error get all albums", "error", err)
 		}

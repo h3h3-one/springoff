@@ -4,12 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"log/slog"
-	"os"
+	"springoff/internal/config"
 	"springoff/internal/models/upload"
 	"springoff/internal/util"
-	"strings"
 )
 
 const (
@@ -37,7 +35,7 @@ func New(storage *sql.DB) *Album {
 	return &Album{db: storage}
 }
 
-func (a *Album) GetAlbums() ([]Albums, error) {
+func (a *Album) GetAll() ([]Albums, error) {
 	rows, err := a.db.Query("SELECT * FROM albums ORDER BY id_album DESC")
 	if err != nil {
 		return nil, err
@@ -57,7 +55,7 @@ func (a *Album) GetAlbums() ([]Albums, error) {
 	return albums, nil
 }
 
-func (a *Album) GetAlbumImages(id string) ([]Images, error) {
+func (a *Album) GetImages(id string) ([]Images, error) {
 	rows, err := a.db.Query("SELECT * FROM images WHERE id_album=?", id)
 	if err != nil {
 		return nil, err
@@ -81,7 +79,7 @@ func (a *Album) GetAlbumImages(id string) ([]Images, error) {
 	return images, nil
 }
 
-func (a *Album) GetTitleAlbum(id string) (string, error) {
+func (a *Album) GetTitle(id string) (string, error) {
 	row := a.db.QueryRow("SELECT title_album FROM albums WHERE id_album=?", id)
 
 	alb := Albums{}
@@ -92,60 +90,41 @@ func (a *Album) GetTitleAlbum(id string) (string, error) {
 	return alb.TitleAlbum, nil
 }
 
-func (a *Album) Upload(upload *upload.Upload, c *fiber.Ctx) error {
-	albumName := util.RandomName()
-	coverName := util.RandomName()
-	pathImage := make([]string, len(upload.Album))
-	slog.Info("save cover", "name", upload.Cover[0].Filename, "size", upload.Cover[0].Size)
+func (a *Album) Upload(upload *upload.Upload, config *config.Config) error {
+	//adding cover
+	coverResp, err := util.UploadFile(upload.Cover[0], config)
+	if err != nil {
+		return err
+	}
+	if coverResp.Status != 200 {
+		slog.Error("Cover not added", "code", coverResp.Status, "body", coverResp.Data, "success", coverResp.Success)
+		return err
+	}
 
-	//creating a folder within a folder with "covers"
-	if err := os.Mkdir(fmt.Sprintf("%s%s", PathCovers, albumName), 0777); err != nil {
-		slog.Error("Error create cover dir", "err", err, "album name", albumName, "path", fmt.Sprintf("%s%s", PathCovers, albumName))
-		return fmt.Errorf("error create cover dir")
-	}
-	cvrCreate, err := os.Create(fmt.Sprintf("%s%s/%s.jpg", PathCovers, albumName, coverName))
-	if err != nil {
-		return fmt.Errorf("error create cover image")
-	}
-	if err := util.WriteFile(upload.Cover[0], cvrCreate); err != nil {
-		return err
-	}
-	err = cvrCreate.Close()
-	if err != nil {
-		return err
-	}
-	//creating a folder within a folder with "albums"
-	if err := os.Mkdir(fmt.Sprintf("%s%s", PathAlbums, albumName), 0777); err != nil {
-		slog.Error("Error create album dir", "err", err, "album name", albumName, "path", fmt.Sprintf("%s%s", PathAlbums, albumName))
-		return fmt.Errorf("error create album dir")
-	}
-	//adding a file to the "albums" folder
+	//adding album image
+	pathImage := make([]string, len(upload.Album))
 	for i := 0; i < len(upload.Album); i++ {
-		albumImageName := util.RandomName()
-		albCreate, err := os.Create(fmt.Sprintf("%s%s/%s.jpg", PathAlbums, albumName, albumImageName))
-		if err != nil {
-			return fmt.Errorf("error create cover image")
-		}
-		if err := util.WriteFile(upload.Album[i], albCreate); err != nil {
-			return err
-		}
-		pathImage[i] = fmt.Sprintf("%s/%s.jpg", albumName, albumImageName)
-		err = albCreate.Close()
+		albumResp, err := util.UploadFile(upload.Album[i], config)
 		if err != nil {
 			return err
 		}
+		if albumResp.Status != 200 {
+			slog.Error("Album image not added", "code", albumResp.Status, "body", albumResp.Data, "success", albumResp.Success)
+			return err
+		}
+		pathImage[i] = albumResp.Data.Link
 	}
 
 	slog.Info("transaction initialization")
 	tx, err := a.db.Begin()
 
-	alb, err := tx.Exec("INSERT INTO albums(title_album, path_cover) VALUES (?,?)", upload.Title[0], fmt.Sprintf("%s/%s.jpg", albumName, coverName))
+	alb, err := tx.Exec("INSERT INTO albums(title_album, path_cover) VALUES (?,?)", upload.Title[0], coverResp.Data.Link)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
-	lastId, _ := alb.LastInsertId()
 
+	lastId, _ := alb.LastInsertId()
 	for i := 0; i < len(pathImage); i++ {
 		_, err = tx.Exec("INSERT INTO images(path_image, id_album) VALUES (?,?)", pathImage[i], lastId)
 		if err != nil {
@@ -159,32 +138,13 @@ func (a *Album) Upload(upload *upload.Upload, c *fiber.Ctx) error {
 		return err
 	}
 	slog.Info("the transaction was successful")
+
 	return nil
 }
 
 func (a *Album) Delete(id int) error {
 
 	slog.Info("delete album", "id album", id)
-
-	album := Albums{}
-	row := a.db.QueryRow("SELECT path_cover FROM albums WHERE id_album=?", id)
-	err := row.Scan(&album.PathCover)
-	if err != nil {
-		slog.Error("error query \"SELECT path_cover FROM albums WHERE id_album=?\"")
-		return err
-	}
-
-	albumName := strings.Split(album.PathCover, "/")[0]
-	if err := os.RemoveAll("./static/covers/" + albumName); err != nil {
-		slog.Error("error delete covers from file system", "err", err)
-		return err
-	}
-	if err := os.RemoveAll("./static/albums/" + albumName); err != nil {
-		slog.Error("error delete covers from file system", "err", err)
-		return err
-	}
-
-	slog.Info("album successfully deleted from file system", "album name", albumName)
 
 	res, err := a.db.Exec(`
 	PRAGMA foreign_keys = ON;

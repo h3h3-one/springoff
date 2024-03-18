@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"github.com/gofiber/fiber/v2"
 	"log/slog"
+	"springoff/internal/config"
 	"springoff/internal/models/album"
 	"springoff/internal/models/upload"
 	"strconv"
@@ -22,13 +23,13 @@ func AlbumNew(db *sql.DB) *Album {
 func (a *Album) GetAlbum() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		idAlbum := c.Params("idAlbum")
-		albumImages, err := a.album.GetAlbumImages(idAlbum)
+		albumImages, err := a.album.GetImages(idAlbum)
 		if err != nil {
 			slog.Error("Error get album images", "error", err, "ID album", idAlbum)
 			return c.SendStatus(404)
 		}
 
-		title, err := a.album.GetTitleAlbum(idAlbum)
+		title, err := a.album.GetTitle(idAlbum)
 		if err != err {
 			slog.Error("Error get title album", "error", err, "id album", idAlbum)
 		}
@@ -39,7 +40,7 @@ func (a *Album) GetAlbum() func(c *fiber.Ctx) error {
 	}
 }
 
-func (a *Album) UploadAlbum() func(c *fiber.Ctx) error {
+func (a *Album) UploadAlbum(config *config.Config) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		if form, err := c.MultipartForm(); err == nil {
 			up, err := upload.New(form.Value["title"], form.File["cover"], form.File["albumImage"])
@@ -50,7 +51,7 @@ func (a *Album) UploadAlbum() func(c *fiber.Ctx) error {
 				})
 			}
 
-			if err := a.album.Upload(up, c); err != nil {
+			if err := a.album.Upload(up, config); err != nil {
 				slog.Error("Error upload album", "err", err)
 				return c.Status(400).JSON(fiber.Map{
 					"error": err.Error(),
