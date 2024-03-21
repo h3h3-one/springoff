@@ -22,17 +22,9 @@ func New(title []string, cover []*multipart.FileHeader, album []*multipart.FileH
 	if len(cover) > 1 || len(cover) == 0 {
 		return nil, fmt.Errorf("more than 1 cover or cover missing")
 	}
-	if cover[0].Header["Content-Type"][0] != "image/jpeg" {
-		return nil, fmt.Errorf("file %s is not a jpeg format", cover[0].Filename)
-	}
 	//album image
 	if len(album) == 0 {
 		return nil, fmt.Errorf("album missing")
-	}
-	for i, _ := range album {
-		if album[i].Header["Content-Type"][0] != "image/jpeg" {
-			return nil, fmt.Errorf("file %s is not a jpeg format", album[i].Filename)
-		}
 	}
 	slog.Info("Validate album successfully")
 	return &Upload{

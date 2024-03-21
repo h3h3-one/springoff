@@ -7,7 +7,6 @@ import (
 	"springoff/internal/config"
 	"springoff/internal/models/album"
 	"springoff/internal/models/upload"
-	"strconv"
 	"strings"
 )
 
@@ -20,13 +19,13 @@ func AlbumNew(db *sql.DB) *Album {
 	return &Album{album: alb}
 }
 
-func (a *Album) GetAlbum() func(c *fiber.Ctx) error {
+func (a *Album) GetAlbum(config *config.Config) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		idAlbum := c.Params("idAlbum")
-		albumImages, err := a.album.GetImages(idAlbum)
+		albumImages, err := a.album.GetImages(idAlbum, config)
 		if err != nil {
 			slog.Error("Error get album images", "error", err, "ID album", idAlbum)
-			return c.SendStatus(404)
+			return c.SendStatus(400)
 		}
 
 		title, err := a.album.GetTitle(idAlbum)
@@ -66,20 +65,44 @@ func (a *Album) UploadAlbum(config *config.Config) func(c *fiber.Ctx) error {
 	}
 }
 
-func (a *Album) DeleteAlbum() func(c *fiber.Ctx) error {
+func (a *Album) DeleteAlbum(config *config.Config) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		temp := string(c.Body())                                  //id=...
-		idAlbum, err := strconv.Atoi(strings.Split(temp, "=")[1]) // int id
-		if err != nil {
-			return err
-		}
-		if err := a.album.Delete(idAlbum); err != nil {
+		temp := string(c.Body())               //id=...
+		idAlbum := strings.Split(temp, "=")[1] // int id
+		if err := a.album.Delete(idAlbum, config); err != nil {
 			return c.Status(400).JSON(fiber.Map{
 				"error": err.Error(),
 			})
 		}
 		return c.Status(200).JSON(fiber.Map{
 			"successfully": "album deleted successfully",
+		})
+	}
+}
+
+type SwapRequest struct {
+	Id    int    `json:"id"`
+	Shift string `json:"shift"`
+}
+
+func (a *Album) SwapAlbum() func(c *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		req := new(SwapRequest)
+		if err := c.BodyParser(&req); err != nil {
+			slog.Error("Error parse body", "error", err)
+			return c.Status(500).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+
+		if err := a.album.Swap(req.Id, req.Shift); err != nil {
+			slog.Error("Error swap album", "error", err)
+			return c.Status(500).JSON(fiber.Map{
+				"error": err.Error(),
+			})
+		}
+		return c.Status(200).JSON(fiber.Map{
+			"successfully": "album swap successfully",
 		})
 	}
 }

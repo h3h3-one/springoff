@@ -2,12 +2,15 @@ package album
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 	"log/slog"
 	"springoff/internal/config"
 	"springoff/internal/models/upload"
 	"springoff/internal/util"
+	"strings"
 )
 
 const (
@@ -22,13 +25,34 @@ type Album struct {
 type Albums struct {
 	IdAlbum    int
 	TitleAlbum string
+	NameAlbum  string
 	PathCover  string
 }
 
 type Images struct {
 	IdImage   int
-	PathImage string
-	IdAlbum   int
+	NameImage string
+	NameAlbum string
+}
+
+type Response struct {
+	Data    Data `json:"data"`
+	Success bool `json:"success"`
+	Status  int  `json:"status"`
+}
+
+type Data struct {
+	Id   string `json:"id"`
+	Link string `json:"link"`
+}
+
+type ErrorResponse struct {
+	Error `json:"error"`
+}
+
+type Error struct {
+	Code    string `json:"code"`
+	Message string `json:"message"`
 }
 
 func New(storage *sql.DB) *Album {
@@ -44,9 +68,9 @@ func (a *Album) GetAll() ([]Albums, error) {
 	var albums []Albums
 	for rows.Next() {
 		alb := Albums{}
-		err := rows.Scan(&alb.IdAlbum, &alb.TitleAlbum, &alb.PathCover)
+		err := rows.Scan(&alb.IdAlbum, &alb.TitleAlbum, &alb.NameAlbum, &alb.PathCover)
 		if err != nil {
-			slog.Error("Error mapping for object Album", "error", err)
+			slog.Error("error mapping for object Album", "error", err)
 			continue
 		}
 		albums = append(albums, alb)
@@ -55,32 +79,70 @@ func (a *Album) GetAll() ([]Albums, error) {
 	return albums, nil
 }
 
-func (a *Album) GetImages(id string) ([]Images, error) {
-	rows, err := a.db.Query("SELECT * FROM images WHERE id_album=?", id)
+type ImageAlbum struct {
+	Data []struct {
+		Id   string `json:"id"`
+		Link string `json:"link"`
+	} `json:"data"`
+}
+
+type Image struct {
+	Link string
+}
+
+func (a *Album) GetImages(id string, config *config.Config) ([]string, error) {
+	rows, err := a.db.Query("SELECT * FROM images WHERE name_album=?", id)
 	if err != nil {
 		return nil, err
 	}
 
-	var images []Images
+	var imageDB []Images
 	for rows.Next() {
 		img := Images{}
-		err := rows.Scan(&img.IdImage, &img.PathImage, &img.IdAlbum)
+		err := rows.Scan(&img.IdImage, &img.NameImage, &img.NameAlbum)
 		if err != nil {
 			slog.Error("Error mapping for object Images", "error", err)
 			continue
 		}
-		images = append(images, img)
+		imageDB = append(imageDB, img)
 	}
 
-	if images == nil {
-		return nil, errors.New("images not found")
+	if imageDB == nil {
+		return nil, fmt.Errorf("album not found")
 	}
 
-	return images, nil
+	agent := fiber.Get(fmt.Sprintf("https://api.imageban.ru/v1/album/%s/images", id))
+	agent.Add("Authorization", config.SecretKey)
+	code, body, _ := agent.String()
+	if code != 200 {
+		slog.Error("error get album", "code", code, "body", body)
+		return nil, fmt.Errorf("error get album")
+	}
+
+	imageAPI := ImageAlbum{}
+	if err := json.Unmarshal([]byte(body), &imageAPI); err != nil {
+		return nil, err
+	}
+
+	var result []string
+	done := true
+	for done {
+		done = false
+		for i := 0; i < len(imageDB); i++ {
+			if imageDB[i].NameImage == imageAPI.Data[i].Id {
+				result = append(result, imageAPI.Data[i].Link)
+				//result[i].Link = append(result, imageAPI.Data[i].Link)
+				imageAPI.Data[i].Id = ""
+				done = true
+			}
+		}
+	}
+
+	return result, nil
 }
 
 func (a *Album) GetTitle(id string) (string, error) {
-	row := a.db.QueryRow("SELECT title_album FROM albums WHERE id_album=?", id)
+	row := a.db.QueryRow("SELECT title_album FROM albums WHERE name_album=?", id)
 
 	alb := Albums{}
 	err := row.Scan(&alb.TitleAlbum)
@@ -91,17 +153,62 @@ func (a *Album) GetTitle(id string) (string, error) {
 }
 
 func (a *Album) Upload(upload *upload.Upload, config *config.Config) error {
-	//adding cover
-	coverResp, err := util.UploadFile(upload.Cover[0], config)
+	slog.Info("create agent")
+
+	agent := fiber.Post("https://api.imageban.ru/v1/album")
+	agent.Add("Authorization", config.SecretKey)
+
+	slog.Info("create album")
+
+	args := fiber.AcquireArgs()
+	args.Set("album_name", upload.Title[0])
+	agent.MultipartForm(args)
+	code, body, _ := agent.String()
+
+	if code != 200 {
+		slog.Error("something went wrong", "code", code, "body", body)
+		return fmt.Errorf("something went wrong when accessing the api")
+	}
+
+	slog.Info("handling an unsuccessful response")
+
+	errorResponse := ErrorResponse{}
+	if err := json.Unmarshal([]byte(body), &errorResponse); err != nil {
+		slog.Error("error unmarshal response json")
+		return err
+	}
+	if len(errorResponse.Message) > 0 {
+		slog.Error("api returned an error", "code", errorResponse.Code, "message", errorResponse.Message)
+		return fmt.Errorf("something went wrong in the making of the album")
+	}
+
+	slog.Info("processing a successful response")
+
+	album := Response{}
+	if err := json.Unmarshal([]byte(body), &album); err != nil {
+		slog.Error("error unmarshal response json")
+		return err
+	}
+	if album.Status != 200 {
+		slog.Error("album not created", "success", album.Success, "status", album.Status)
+		return fmt.Errorf("album not created. status=%s", album.Status)
+	}
+
+	slog.Info("album created", "id", album.Data.Id)
+
+	slog.Info("adding cover image")
+
+	cover, err := util.UploadFile(upload.Cover[0], config)
 	if err != nil {
 		return err
 	}
-	if coverResp.Status != 200 {
-		slog.Error("Cover not added", "code", coverResp.Status, "body", coverResp.Data, "success", coverResp.Success)
+	if cover.Status != 200 {
+		slog.Error("Cover not added", "code", cover.Status, "body", cover.Data, "success", cover.Success)
 		return err
 	}
 
-	//adding album image
+	slog.Info("adding image")
+
 	pathImage := make([]string, len(upload.Album))
 	for i := 0; i < len(upload.Album); i++ {
 		albumResp, err := util.UploadFile(upload.Album[i], config)
@@ -112,21 +219,21 @@ func (a *Album) Upload(upload *upload.Upload, config *config.Config) error {
 			slog.Error("Album image not added", "code", albumResp.Status, "body", albumResp.Data, "success", albumResp.Success)
 			return err
 		}
-		pathImage[i] = albumResp.Data.Link
+		pathImage[i] = albumResp.Data.Id
 	}
 
 	slog.Info("transaction initialization")
+
 	tx, err := a.db.Begin()
 
-	alb, err := tx.Exec("INSERT INTO albums(title_album, path_cover) VALUES (?,?)", upload.Title[0], coverResp.Data.Link)
+	_, err = tx.Exec("INSERT INTO albums(title_album, name_album, cover) VALUES (?,?,?)", upload.Title[0], album.Data.Id, cover.Data.Link)
 	if err != nil {
 		tx.Rollback()
 		return err
 	}
 
-	lastId, _ := alb.LastInsertId()
 	for i := 0; i < len(pathImage); i++ {
-		_, err = tx.Exec("INSERT INTO images(path_image, id_album) VALUES (?,?)", pathImage[i], lastId)
+		_, err = tx.Exec("INSERT INTO images(name_image, name_album) VALUES (?,?)", pathImage[i], album.Data.Id)
 		if err != nil {
 			tx.Rollback()
 			return err
@@ -137,21 +244,57 @@ func (a *Album) Upload(upload *upload.Upload, config *config.Config) error {
 	if err != nil {
 		return err
 	}
-	slog.Info("the transaction was successful")
+
+	slog.Info("adding image in album")
+	slog.Info("create agent")
+
+	agent = fiber.Put(fmt.Sprintf("https://api.imageban.ru/v1/album/%s", album.Data.Id))
+	agent.Add("Authorization", config.SecretKey)
+
+	args = fiber.AcquireArgs()
+	args.Set("images", strings.Join(pathImage, ","))
+	agent.MultipartForm(args)
+	code, body, _ = agent.String()
+
+	if code != 200 {
+		slog.Error("error adding image in album", "code", code, "body", body)
+		return fmt.Errorf("error adding image in album")
+	}
 
 	return nil
 }
 
-func (a *Album) Delete(id int) error {
+type DeleteResponse struct {
+	Status int
+}
+
+func (a *Album) Delete(id string, config *config.Config) error {
 
 	slog.Info("delete album", "id album", id)
 
-	res, err := a.db.Exec(`
-	PRAGMA foreign_keys = ON;
-	DELETE FROM albums WHERE id_album=?
+	agent := fiber.Delete(fmt.Sprintf("https://api.imageban.ru/v1/album/%s", id))
+	agent.Add("Authorization", config.SecretKey)
+	code, body, _ := agent.String()
+	if code != 200 {
+		slog.Error("something went wrong", "code", code, "body", body)
+		return fmt.Errorf("something went wrong when accessing the api")
+	}
+
+	resp := DeleteResponse{}
+	if err := json.Unmarshal([]byte(body), &resp); err != nil {
+		return err
+	}
+
+	if resp.Status != 200 {
+		slog.Error("album not deleted", "code", resp.Status)
+		return fmt.Errorf("album not deleted, code %d", resp.Status)
+	}
+
+	resAlbum, err := a.db.Exec(`
+	DELETE FROM albums WHERE name_album=?
 	`, id)
-	affect, err := res.RowsAffected()
-	if affect == 0 {
+	affectAlbum, err := resAlbum.RowsAffected()
+	if affectAlbum == 0 {
 		slog.Error("album deletion error", "id", id)
 		return fmt.Errorf("the album hasn't been deleted")
 	}
@@ -160,7 +303,79 @@ func (a *Album) Delete(id int) error {
 		return err
 	}
 
+	resImage, err := a.db.Exec(`
+	DELETE FROM images WHERE name_album=?
+	`, id)
+	affectImage, err := resImage.RowsAffected()
+	if affectImage == 0 {
+		slog.Error("images deletion error", "id", id)
+		return fmt.Errorf("the album hasn't been deleted")
+	}
+	if err != nil {
+		slog.Error("error when executing a request to delete an images")
+		return err
+	}
+
 	slog.Info("album successfully deleted from database")
 
+	return nil
+}
+
+func (a *Album) Swap(id int, shift string) error {
+	slog.Info("swapping album", "id", id, "shift", shift)
+
+	var albumNearId int
+	albumCurrent := new(Albums)
+	albumNear := new(Albums)
+
+	switch shift {
+	case "left":
+		albumNearId = id + 1
+	case "right":
+		albumNearId = id - 1
+	default:
+		slog.Error("unknown action", "id", id, "action", shift)
+		return fmt.Errorf("unknown action: %s", shift)
+	}
+
+	slog.Info("Init query SELECT * FROM albums WHERE id_album=?", "id", id)
+	rowCurrent := a.db.QueryRow("SELECT * FROM albums WHERE id_album=?", id)
+	slog.Info("Init query SELECT * FROM albums WHERE id_album=?", "id", albumNearId)
+	rowNear := a.db.QueryRow("SELECT * FROM albums WHERE id_album=?", albumNearId)
+
+	if err := rowCurrent.Scan(&albumCurrent.IdAlbum, &albumCurrent.TitleAlbum, &albumCurrent.NameAlbum, &albumCurrent.PathCover); err != nil {
+		slog.Error("error query row current album", "error", err)
+		return err
+	}
+	err := rowNear.Scan(&albumNear.IdAlbum, &albumNear.TitleAlbum, &albumNear.NameAlbum, &albumNear.PathCover)
+	//if they try to move the outermost albums
+	if errors.Is(sql.ErrNoRows, err) {
+		slog.Info("the shift goes beyond the scope of the album")
+		return fmt.Errorf("the shift goes beyond the scope of the album")
+	}
+	if err != nil {
+		slog.Error("error query row near album", "error", err)
+		return err
+	}
+
+	tempTitle := albumCurrent.TitleAlbum
+	tempName := albumCurrent.NameAlbum
+	tempPath := albumCurrent.PathCover
+
+	tx, err := a.db.Begin()
+	_, err = tx.Exec("UPDATE albums SET title_album=?, name_album=?, cover=? WHERE id_album=?", albumNear.TitleAlbum, albumNear.NameAlbum, albumNear.PathCover, id)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = tx.Exec("UPDATE albums SET title_album=?, name_album=?, cover=? WHERE id_album=?", tempTitle, tempName, tempPath, albumNearId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
 	return nil
 }

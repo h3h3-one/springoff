@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
@@ -16,7 +15,6 @@ import (
 	"springoff/internal/logger"
 	"springoff/internal/middleware/auth"
 	"springoff/internal/storage/sqlite3"
-	"time"
 )
 
 type Users struct {
@@ -59,11 +57,11 @@ func main() {
 	})
 	//middleware
 	app.Use(auth.Check(db))
-	app.Use(limiter.New(limiter.Config{
-		Max:               20,
-		Expiration:        30 * time.Second,
-		LimiterMiddleware: limiter.SlidingWindow{},
-	}))
+	//app.Use(limiter.New(limiter.Config{
+	//	Max:               20,
+	//	Expiration:        30 * time.Second,
+	//	LimiterMiddleware: limiter.SlidingWindow{},
+	//}))
 	app.Use(recover.New())
 	//static files
 	app.Static("/", "./static", fiber.Static{Compress: true})
@@ -81,7 +79,7 @@ func main() {
 	app.Get("/service", service.GetService())
 	app.Get("/about", about.GetAbout())
 	app.Get("/contact", contact.GetContact())
-	app.Get("/albums/:idAlbum", album.GetAlbum())
+	app.Get("/albums/:idAlbum", album.GetAlbum(cfg))
 
 	api := app.Group("/admin", basicauth.New(basicauth.Config{
 		Authorizer: func(login string, password string) bool {
@@ -111,7 +109,8 @@ func main() {
 	})
 
 	api.Post("/album", album.UploadAlbum(cfg))
-	api.Delete("/album", album.DeleteAlbum())
+	api.Delete("/album", album.DeleteAlbum(cfg))
+	api.Put("/album/swap", album.SwapAlbum())
 
 	log.Fatal(app.Listen(cfg.Address + cfg.Port))
 }

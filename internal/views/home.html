@@ -6,10 +6,15 @@
             <div class="image-wrap-2">
                 <div class="image-info">
                     <h2 class="mb-3">{{.TitleAlbum}}</h2>
-                    <a href="/albums/{{.IdAlbum}}" class="btn btn-outline-white py-2 px-4">Больше фото</a>
+                    <a href="/albums/{{.NameAlbum}}" class="btn btn-outline-white py-2 px-4">Больше фото</a>
                     {{if $.Auth}}
-                    <br><br>
-                    <button class="btn-danger text-light py-2 px-4" onclick="deleteAlbum(this)" value="{{.IdAlbum}}">Удалить</button>
+                    <br>
+                    <br>
+                    <button class="btn btn-outline-white py-2 px-3" value="{{.IdAlbum}}" name="left" onclick="swapAlbum(this)"><</button>
+                    <button class="btn btn-outline-white py-2 px-3" value="{{.IdAlbum}}" name="right" onclick="swapAlbum(this)">></button>
+                    <br>
+                    <br>
+                    <button class="btn btn-outline-white py-2 px-4" onclick="deleteAlbum(this)" value="{{.NameAlbum}}">Удалить</button>
                     {{end}}
                 </div>
                 <img src="{{.PathCover}}" alt="Image" class="img-fluid">
@@ -43,6 +48,28 @@
                 }
             })
         }
+    }
+    
+    function swapAlbum(e) {
+        fetch("/admin/album/swap", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id: parseInt(e.value),
+                shift: e.name
+            })
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                if(res.error){
+                    alert(res.error)
+                } else {
+                    alert(res.successfully)
+                    window.location = "/"
+                }
+            })
     }
 </script>
 {{end}}

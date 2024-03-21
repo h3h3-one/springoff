@@ -14,9 +14,9 @@
         </div>
         <div class="row" id="lightgallery"  data-masonry='{"percentPosition": true }'>
 
-            {{range .AlbumImages}}
-            <div class="col-sm-6 col-md-4 col-lg-3 col-xl-3 item" data-aos="fade" data-src="{{.PathImage}}" data-sub-html="<h4>Fading Light</h4><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolor doloremque hic excepturi fugit, sunt impedit fuga tempora, ad amet aliquid?</p>">
-                <a href="#"><img src="{{.PathImage}}" alt="IMage" class="img-fluid"></a>
+            {{range .AlbumImages }}
+            <div class="col-sm-6 col-md-4 col-lg-3 col-xl-3 item" data-aos="fade" data-src="{{ . }}" data-sub-html="IMAGE">
+                <a href="#"><img src="{{ . }}" alt="IMage" class="img-fluid"></a>
             </div>
             {{end}}
 

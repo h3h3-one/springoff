@@ -17,6 +17,7 @@ type Response struct {
 }
 
 type Data struct {
+	Id   string `json:"id"`
 	Link string `json:"link"`
 }
 
