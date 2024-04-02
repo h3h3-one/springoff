@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
-	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
@@ -16,7 +15,6 @@ import (
 	"springoff/internal/logger"
 	"springoff/internal/middleware/auth"
 	"springoff/internal/storage/sqlite3"
-	"time"
 )
 
 type Users struct {
@@ -59,11 +57,6 @@ func main() {
 	})
 	//middleware
 	app.Use(auth.Check(db))
-	app.Use(limiter.New(limiter.Config{
-		Max:               30,
-		Expiration:        30 * time.Second,
-		LimiterMiddleware: limiter.SlidingWindow{},
-	}))
 	app.Use(recover.New())
 	//static files
 	app.Static("/", "/root/springoff/static", fiber.Static{Compress: true})
