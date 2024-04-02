@@ -42,7 +42,7 @@ func main() {
 	}
 
 	//template engine
-	engine := html.New("./internal/views", ".html")
+	engine := html.New("/root/springoff/internal/views", ".html")
 	app := fiber.New(fiber.Config{
 		Views:       engine,
 		ViewsLayout: "layouts/main",
@@ -66,7 +66,7 @@ func main() {
 	}))
 	app.Use(recover.New())
 	//static files
-	app.Static("/", "./static", fiber.Static{Compress: true})
+	app.Static("/", "/root/springoff/static", fiber.Static{Compress: true})
 
 	//controllers
 	home := controllers.HomeNew(db)

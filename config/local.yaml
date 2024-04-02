@@ -1,5 +1,5 @@
 env: "local"
-storage: "./storage/storage.db"
+storage: "/root/springoff/storage/storage.db"
 http_server:
   address: "localhost"
   port: ":8080"
