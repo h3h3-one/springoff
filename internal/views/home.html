@@ -6,7 +6,7 @@
             <div class="image-wrap-2">
                 <div class="image-info">
                     <h2 class="mb-3">{{.TitleAlbum}}</h2>
-                    <a href="/albums/{{.NameAlbum}}" class="btn btn-outline-white py-2 px-4">Больше фото</a>
+                    <a href="https://springphoto.ru/albums/{{.NameAlbum}}" class="btn btn-outline-white py-2 px-4">Больше фото</a>
                     {{if $.Auth}}
                     <br>
                     <br>
@@ -17,7 +17,7 @@
                     <button class="btn btn-outline-white py-2 px-4" onclick="deleteAlbum(this)" value="{{.NameAlbum}}">Удалить</button>
                     {{end}}
                 </div>
-                <img src="{{.PathCover}}" alt="Image" class="img-fluid">
+                <img src="https://springphoto.ru/{{.PathCover}}" alt="Image" class="img-fluid">
             </div>
         </div>
         {{end}}
