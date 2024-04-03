@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
+	"github.com/gofiber/fiber/v2/middleware/favicon"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
@@ -58,6 +59,9 @@ func main() {
 	//middleware
 	app.Use(auth.Check(db))
 	app.Use(recover.New())
+	app.Use(favicon.New(favicon.Config{
+		File: "./internal/static/image/favicon.ico",
+	}))
 	//static files
 	app.Static("/", "/root/springoff/static", fiber.Static{Compress: true})
 
