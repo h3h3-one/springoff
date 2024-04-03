@@ -60,7 +60,7 @@ func main() {
 	app.Use(auth.Check(db))
 	app.Use(recover.New())
 	app.Use(favicon.New(favicon.Config{
-		File: "./internal/static/image/favicon.ico",
+		File: "/root/springoff/internal/static/image/favicon.ico",
 	}))
 	//static files
 	app.Static("/", "/root/springoff/static", fiber.Static{Compress: true})
