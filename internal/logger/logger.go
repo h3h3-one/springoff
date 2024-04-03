@@ -1,8 +1,6 @@
 package logger
 
 import (
-	"io"
-	"log"
 	"log/slog"
 	"os"
 )
@@ -15,10 +13,6 @@ const (
 
 func New(env string) {
 	var logger *slog.Logger
-
-	file, _ := os.OpenFile("/root/springoff/logs/file.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	iw := io.MultiWriter(os.Stdout, file)
-	log.SetOutput(iw)
 
 	switch env {
 	case envLocal:
